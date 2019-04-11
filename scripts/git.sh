@@ -34,6 +34,10 @@ if confirm "Would you like to generate an SSH key?" ; then
 	ssh-keygen -t rsa -b 4096 -C "$email" -f $key
 	eval $(ssh-agent -s) > /dev/null
 	echo "Adding ssh key to ssh-agent"
-	ssh-add "$key.pub"
+	ssh-add "$key"
+
+	echo ""
+	echo "Here is your public key to copy to GitHub:"
+	cat "$key.pub"
 fi
 end "git"
