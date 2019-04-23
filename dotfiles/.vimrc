@@ -11,10 +11,10 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 
 " languages
-Plugin 'tpope/vim-commentary'
 
 " text manipulation
-Plugin 'tpope/vim-surround'
+Plugin 'tpope/vim-surround'			" new surround motion bound to s
+Plugin 'tpope/vim-commentary'			" gc to comment
 
 " colors
 Plugin 'chriskempson/base16-vim'
@@ -22,8 +22,9 @@ Plugin 'itchyny/lightline.vim'
 Plugin 'lilydjwg/colorizer'
 
 " navigation
-Plugin 'jeffkreeftmeijer/vim-numbertoggle'
+" Plugin 'jeffkreeftmeijer/vim-numbertoggle'
 Plugin 'scrooloose/nerdtree'
+Plugin 'ctrlpvim/ctrlp.vim'			" Ctrl+p to fuzzy search files
 
 " other utilities
 Plugin 'xolox/vim-misc'
@@ -47,10 +48,6 @@ vnoremap ; :
 
 set autoread
 
-" Set title string to:
-" | directory info (max 12 char) | buff. no | filename | modified | Type | Row no.
-set title titlestring=...%{strpart(expand(\"%:p:h\"),stridx(expand(\"%:p:h\"),\"/\",strlen(expand(\"%:p:h\"))-12))}%=%n.\ \ %{expand(\"%:t:r\")}\ %m\ %Y\ \ \ \ %l\ of\ %L
-
 " Triger `autoread` when files changes on disk
 " https://unix.stackexchange.com/questions/149209/refresh-changed-content-of-file-opened-in-vim/383044#383044
 " https://vi.stackexchange.com/questions/13692/prevent-focusgained-autocmd-running-in-command-line-editing-mode
@@ -59,28 +56,6 @@ autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checkti
 " https://vi.stackexchange.com/questions/13091/autocmd-event-for-autoread
 autocmd FileChangedShellPost *
   \ echohl WarningMsg | echo "File changed on disk. Buffer reloaded." | echohl None
-
-" vim-airline settings -----------------------------------------------
-" let g:airline_theme = 'ubaryd'
-" let g:airline_left_sep=''
-" let g:airline_left_alt_sep='|'
-" let g:airline_right_sep=''
-" let g:airline_right_alt_sep='|'
-" let g:airline_section_z=''
-" let g:airline#extensions#tabline#left_sep = ' '
-" let g:airline#extensions#tabline#left_alt_sep = '|'
-" let g:airline#extensions#tabline#right_sep = ' '
-" let g:airline#extensions#tabline#right_alt_sep = '|'
-" let g:airline#extensions#tabline#enabled = 1
-" function! AirlineInit()
-"   let g:airline_section_a = airline#section#create(['mode','branch'])
-"   let g:airline_section_b = airline#section#create_left(['%f%m'])
-"   let g:airline_section_c = airline#section#create(['filetype'])
-"   let g:airline_section_x = airline#section#create(['ffenc'])
-"   " let g:airline_section_y = airline#section#create(['%B'])
-"   let g:airline_section_z = airline#section#create_right(['%p%%','L: %l','C: %c'])
-" endfunction
-" autocmd VimEnter * call AirlineInit()
 
 
 " lightline settings -------------------------------------------------
@@ -102,29 +77,104 @@ autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 autocmd BufNewFile,BufRead *.md setlocal spell spelllang=en_us
 
 
-" Colors -------------------------------------------------------------
-set t_Co=256                    " force 256 colors
-let base16colorspace=256        " access colors present in 256 colorspace
-" colorscheme base16-ashes
-set background=light
+" Keybindings --------------------------------------------------------
 
-let g:rehash256=1
+" switch to normal mode with jj
+inoremap jj <ESC>
+inoremap JJ <ESC>
+
+" <Space>-p to toggle paste mode (but only in normal and visual)
+" set pastetoggle=<leader>p
+nnoremap <space>p :set invpaste<CR>
+vnoremap <space>p :set invpaste<CR>
+
+" Jump to start and end of line using H and L
+noremap H ^
+noremap L $
+
+" move up/down on a wrapped line with k and j
+" but still work correctly with counts
+noremap <expr> j v:count ? 'j' : 'gj'
+noremap <expr> k v:count ? 'k' : 'gk'
+
+" I don't fucking want to join lines ever!!
+nnoremap J j
+vnoremap J j
+
+" Removes doc lookup mapping because it's easy to fat finger and never useful.
+nnoremap K k
+vnoremap K k
+
+" Shift-J and Shift-K to move up and down a little faster
+noremap J 4j
+noremap K 4k
+
+" Ctrl-J to go down by pages
+" Ctrl-K to go up just as fast
+noremap <C-j> <C-F>
+noremap <C-k> <C-B>
+
+" Because my tmux maps Ctrl+k to clear the screen
+noremap <C-l> <C-B>
+
+" By default, <C-F> and <C-B> scroll down and up pages
+" and <C-D> and <C-U> scroll up and down by half pages.
+" This makes <C-F> and <C-D> go down and up by 
+noremap <C-F> <C-D>
+noremap <C-D> <C-U>
+
+" Make Y behave like other capital commands.
+" Hat-tip http://vimbits.com/bits/11
+nnoremap Y y$
+
+" remap U to <C-r> for easier redo
+" from http://vimbits.com/bits/356
+nnoremap U <C-r>
+
+" Don't move on *
+nnoremap <silent> * :let stay_star_view = winsaveview()<cr>*:call winrestview(stay_star_view)<cr>
+
+" Use sane/perl-like regular expressions
+nnoremap / /\v
+vnoremap / /\v
+
+" move around code blocks with <TAB>
+nnoremap <tab> %
+vnoremap <tab> %
+
+" no one ever hits F1 on purpose
+inoremap <F1> <ESC>
+nnoremap <F1> <ESC>
+vnoremap <F1> <ESC>
+
+
+" Leader Keybinds ---------------------------------------------------
+let mapleader = "\<Space>"
+
+" clear search highlight with <space><space>
+nnoremap <leader><space> :noh<cr>
+
+" get help on current word with <leader>h
+nnoremap <leader>h :h <C-r><C-w><CR>
+
+
+" Colors -------------------------------------------------------------
+" set t_Co=256                    " force 256 colors
+" let base16colorspace=256        " access colors present in 256 colorspace
+" colorscheme base16-ashes
+colorscheme desert
+
+" let g:rehash256=1
 " let g:sh_indent_case_labels=1
 
 " overwrite base16-vim setting for transparent background
-highlight Normal ctermbg=NONE
-
-
-set noswapfile
+" highlight Normal ctermbg=NONE
 
 " Look and feel ------------------------------------------------------
-" set textwidth=80
 set wrapmargin=2
 set autoread                    " set to auto read when file changed from the outside
-set number                      " show line numbers
-" set relativenumber              " use relative line numbers
-set norelativenumber
-" set nowrap                      " disable wrapping
+set number relativenumber	" show line numbers
+" set nowrap                    " disable wrapping
 set mouse=c                     " disable mouse in normal/insert/command/visual
 set ttyfast                     " improve scrolling speed
 set nofoldenable                " disable folding
@@ -153,10 +203,8 @@ set nostartofline               " leave cursor where it was
 set nocursorline		" try to speed up scrolling
 set report=0                    " report back all changes
 set ruler                       " always show current positions along the bottom
-set omnifunc=ccomplete#Complete " we use C god damnit
 
-
-set showcmd     " show command on last line of screen (as they're being input)
+set showcmd     		" show command on last line of screen (as they're being input)
 set showmode
 
 " visual autocomplete for command menu
@@ -176,58 +224,6 @@ set tabstop=8                   " spaces for <Tab>
 set noswapfile
 
 
-" Keybindings --------------------------------------------------------
-set pastetoggle=<F2>            " F2 to toggle paste mode
-let mapleader = "\<Space>"
-
-" move between windows with CTL + {h,j,k,l}
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-
-" Jump to start and end of line using [F]ront and [R]ear
-noremap F ^
-noremap R $
-
-" move up/down on a wrapped line with k and l
-"nnoremap k gj
-"nnoremap l gk
-
-" do things right / turn off arrow keys
-nnoremap <up> k 
-nnoremap <down> j
-nnoremap <left> h
-nnoremap <right> l
-
-" clear search highlight with <space><space>
-nnoremap <leader><space> :noh<cr>
-
-" Use sane/perl-like regular expressions
-nnoremap / /\v
-vnoremap / /\v
-
-" move around code blocks with <TAB>
-nnoremap <tab> %
-vnoremap <tab> %
-
-" no one ever hits F1 on purpose
-inoremap <F1> <ESC>
-nnoremap <F1> <ESC>
-vnoremap <F1> <ESC>
-
-" switch to normal mode with jj
-inoremap jj <ESC>
-
-" remap to normal home keys
-noremap k k
-noremap j j
-noremap h h
-noremap l l
-
-" Alt-right/left to navigate forward/backward in the tags stack
-map <C-F> <C-T>
-" map <M-]> <C-]>
 
 " Functions -------------------------------------------------
 " Prevent replacing paste buffer on paste
@@ -242,33 +238,33 @@ endfunction
 vmap <silent> <expr> p <sid>Repl()
 cs add $CSCOPE_DB
 
-function! RangeSearch(direction)
-  call inputsave()
-  let g:srchstr = input(a:direction)
-  call inputrestore()
-  if strlen(g:srchstr) > 0
-    let g:srchstr = g:srchstr.
-          \ '\%>'.(line("'<")-1).'l'.
-          \ '\%<'.(line("'>")+1).'l'
-  else
-    let g:srchstr = ''
-  endif
-endfunction
-vnoremap <silent> / :<C-U>call RangeSearch('/')<CR>:if strlen(g:srchstr) > 0\|exec '/'.g:srchstr\|endif<CR>
-vnoremap <silent> ? :<C-U>call RangeSearch('?')<CR>:if strlen(g:srchstr) > 0\|exec '?'.g:srchstr\|endif<CR>
+" function! RangeSearch(direction)
+"   call inputsave()
+"   let g:srchstr = input(a:direction)
+"   call inputrestore()
+"   if strlen(g:srchstr) > 0
+"     let g:srchstr = g:srchstr.
+"           \ '\%>'.(line("'<")-1).'l'.
+"           \ '\%<'.(line("'>")+1).'l'
+"   else
+"     let g:srchstr = ''
+"   endif
+" endfunction
+" vnoremap <silent> / :<C-U>call RangeSearch('/')<CR>:if strlen(g:srchstr) > 0\|exec '/'.g:srchstr\|endif<CR>
+" vnoremap <silent> ? :<C-U>call RangeSearch('?')<CR>:if strlen(g:srchstr) > 0\|exec '?'.g:srchstr\|endif<CR>
 
-autocmd bufreadpre *.txt setlocal textwidth=70
-autocmd bufreadpre *.tex setlocal textwidth=70
-autocmd bufreadpre *.c setlocal textwidth=70
-autocmd bufreadpre *.h setlocal textwidth=70
-function! LoadCscope()
-  let db = findfile("cscope.out", ".;")
-  if (!empty(db))
-    let path = strpart(db, 0, match(db, "/cscope.out$"))
-    set nocscopeverbose " suppress 'duplicate connection' error
-    exe "cs add " . db . " " . path
-    set cscopeverbose
-  endif
-endfunction
-au BufEnter /* call LoadCscope()
-autocmd bufreadpre *.gnu set commentstring=#\ %s
+" autocmd bufreadpre *.txt setlocal textwidth=70
+" autocmd bufreadpre *.tex setlocal textwidth=70
+" autocmd bufreadpre *.c setlocal textwidth=70
+" autocmd bufreadpre *.h setlocal textwidth=70
+" function! LoadCscope()
+"   let db = findfile("cscope.out", ".;")
+"   if (!empty(db))
+"     let path = strpart(db, 0, match(db, "/cscope.out$"))
+"     set nocscopeverbose " suppress 'duplicate connection' error
+"     exe "cs add " . db . " " . path
+"     set cscopeverbose
+"   endif
+" endfunction
+" au BufEnter /* call LoadCscope()
+" autocmd bufreadpre *.gnu set commentstring=#\ %s
