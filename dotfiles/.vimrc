@@ -15,11 +15,14 @@ Plugin 'gmarik/Vundle.vim'
 " text manipulation
 Plugin 'tpope/vim-surround'			" new surround motion bound to s
 Plugin 'tpope/vim-commentary'			" gc to comment
+"  context-aware pasting
+Plugin 'sickill/vim-pasta'
 
 " colors
 Plugin 'chriskempson/base16-vim'
 Plugin 'itchyny/lightline.vim'
 Plugin 'lilydjwg/colorizer'
+Plugin 'srcery-colors/srcery-vim'
 
 " navigation
 " Plugin 'jeffkreeftmeijer/vim-numbertoggle'
@@ -30,6 +33,9 @@ Plugin 'ctrlpvim/ctrlp.vim'			" Ctrl+p to fuzzy search files
 Plugin 'xolox/vim-misc'
 " Plugin 'tpope/vim-obsession'
 Plugin 'tmux-plugins/vim-tmux-focus-events'
+Plugin 'christoomey/vim-tmux-navigator'
+" TODO Plugin 'benmills/vimux'
+" https://raw.githubusercontent.com/benmills/vimux/master/doc/vimux.txt
 
 " Man page
 Plugin 'vim-utils/vim-man'
@@ -43,8 +49,7 @@ syntax on
 filetype plugin on      " required
 filetype indent on      " required
 
-nnoremap ; :
-vnoremap ; :
+
 
 set autoread
 
@@ -61,8 +66,11 @@ autocmd FileChangedShellPost *
 " lightline settings -------------------------------------------------
 let g:Powerline_symbols = 'fancy'
 let g:lightline = {
-      \ 'colorscheme': 'wombat',
-      \ }
+	\ 'colorscheme': 'wombat',
+	\ }
+"let g:lightline = {
+"	\ 'colorscheme': 'srcery',
+"	\}
 
 
 " General ------------------------------------------------------------
@@ -78,6 +86,18 @@ autocmd BufNewFile,BufRead *.md setlocal spell spelllang=en_us
 
 
 " Keybindings --------------------------------------------------------
+
+" Before I remap ;
+" Default motion repeat for tTfF is ; (forward) and , (backward)
+" Remap , to forward and Shift+, to backward.
+nnoremap < ,
+vnoremap < ,
+nnoremap , ;
+vnoremap , ;
+
+" Rebind ; to : (fewer keystrokes)
+nnoremap ; :
+vnoremap ; :
 
 " switch to normal mode with jj
 inoremap jj <ESC>
@@ -109,13 +129,23 @@ vnoremap K k
 noremap J 4j
 noremap K 4k
 
-" Ctrl-J to go down by pages
-" Ctrl-K to go up just as fast
-noremap <C-j> <C-F>
-noremap <C-k> <C-B>
+" move line mappings
+" ∆ is <A-j> on macOS
+" ˚ is <A-k> on macOS
+nnoremap ∆ :m .+1<cr>==
+nnoremap ˚ :m .-2<cr>==
+inoremap ∆ <Esc>:m .+1<cr>==gi
+inoremap ˚ <Esc>:m .-2<cr>==gi
+vnoremap ∆ :m '>+1<cr>gv=gv
+vnoremap ˚ :m '<-2<cr>gv=gv
 
-" Because my tmux maps Ctrl+k to clear the screen
-noremap <C-l> <C-B>
+" More natural window switching
+" Integrated with vim-tmux-navigator
+nnoremap <silent> <C-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <C-l> :TmuxNavigateRight<cr>
+nnoremap <silent> <C-\> :TmuxNavigatePrevious<cr>
 
 " By default, <C-F> and <C-B> scroll down and up pages
 " and <C-D> and <C-U> scroll up and down by half pages.
@@ -159,10 +189,11 @@ nnoremap <leader>h :h <C-r><C-w><CR>
 
 
 " Colors -------------------------------------------------------------
-" set t_Co=256                    " force 256 colors
+set t_Co=256                    " force 256 colors
 " let base16colorspace=256        " access colors present in 256 colorspace
 " colorscheme base16-ashes
 colorscheme desert
+" colorscheme srcery
 
 " let g:rehash256=1
 " let g:sh_indent_case_labels=1
