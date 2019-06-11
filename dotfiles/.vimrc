@@ -73,6 +73,11 @@ let g:lightline = {
 "	\}
 
 
+" ctrlp settings ----------------------------------------------------
+
+let g:ctrlp_match_window = 'results:100'
+
+
 " General ------------------------------------------------------------
 set encoding=utf-8
 set clipboard=unnamed           " share windows clipboard += windows
@@ -84,10 +89,13 @@ set wrap
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 autocmd BufNewFile,BufRead *.md setlocal spell spelllang=en_us
 
-
 " Keybindings --------------------------------------------------------
 
-" Before I remap ;
+" Rebind ; to : (fewer keystrokes)
+nnoremap ; :
+vnoremap ; :
+
+" Since I remapped ;
 " Default motion repeat for tTfF is ; (forward) and , (backward)
 " Remap , to forward and Shift+, to backward.
 nnoremap < ,
@@ -95,13 +103,16 @@ vnoremap < ,
 nnoremap , ;
 vnoremap , ;
 
-" Rebind ; to : (fewer keystrokes)
-nnoremap ; :
-vnoremap ; :
-
 " switch to normal mode with jj
 inoremap jj <ESC>
 inoremap JJ <ESC>
+" also from inside command mode
+cnoremap jj <C-c>
+cnoremap JJ <C-c>
+
+" remap Ctrl+j/k to navigate back and forth through the command history
+cnoremap <C-j> <Down>
+cnoremap <C-k> <Up>
 
 " <Space>-p to toggle paste mode (but only in normal and visual)
 " set pastetoggle=<leader>p
@@ -114,6 +125,8 @@ noremap L $
 
 " move up/down on a wrapped line with k and j
 " but still work correctly with counts
+" noremap j j
+" noremap k k
 noremap <expr> j v:count ? 'j' : 'gj'
 noremap <expr> k v:count ? 'k' : 'gk'
 
@@ -169,8 +182,9 @@ nnoremap / /\v
 vnoremap / /\v
 
 " move around code blocks with <TAB>
-nnoremap <tab> %
-vnoremap <tab> %
+" actually this breaks Ctrl+i for jumping backwards in jump stack
+" nnoremap <tab> %
+" vnoremap <tab> %
 
 " no one ever hits F1 on purpose
 inoremap <F1> <ESC>
