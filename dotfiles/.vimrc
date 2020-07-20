@@ -58,6 +58,7 @@ Plugin 'tpope/vim-repeat'                       " Repeatable custom mappings
 Plugin 'skywind3000/asyncrun.vim'               " AsyncRun function
 Plugin 'xolox/vim-session'                      " Create named sessions
 Plugin 'Vimjas/vim-python-pep8-indent'          " Python indentation
+Plugin 'triglav/vim-visual-increment'		" Increment numbers in columns
 " TODO Plugin 'benmills/vimux'
 " https://raw.githubusercontent.com/benmills/vimux/master/doc/vimux.txt
 
@@ -370,6 +371,33 @@ nnoremap <silent> <leader>p :call <sid>setup_paste()<CR>o
 " <leader>-P to enable paste, enter insert mode on *current* line
 nnoremap <silent> <leader>P :call <sid>setup_paste()<CR>i
 
+" LaTeX:
+" <leader>-be to begin enumerate
+nnoremap <silent> <leader>be i\begin{enumerate}<CR>\end{enumerate}<ESC>O
+xmap     <silent> <leader>be S\begin{enumerate}<CR>
+" <leader>-bi to begin itemize
+nnoremap <silent> <leader>bi i\begin{itemize}<CR>\end{itemize}<ESC>O
+xmap     <silent> <leader>bi S\begin{itemize}<CR>
+" <leader>-bv to begin verbatim
+nnoremap <silent> <leader>bv i\begin{verbatim}<CR>\end{verbatim}<ESC>O
+xmap     <silent> <leader>bv S\begin{verbatim}<CR>
+" <leader>-it to textit{}
+nmap     <leader>it ysiW\textit<CR>
+vmap     <leader>it S\textit<CR>
+" <leader>-bf to textbf{}
+nmap     <leader>bf ysiW\textbf<CR>
+vmap     <leader>bf S\textbf<CR>
+" <leader>-tt to texttt{}
+nnoremap <silent> <Plug>BenVimrcEscapeLatex f{v%:s/\(_\\|&\)/\\\1/g<CR>:noh<CR>`<B
+nmap     <leader>tt ysiW\texttt<CR>:execute "normal \<Plug>BenVimrcEscapeLatex"<CR>
+vmap     <leader>tt S\texttt<CR>:execute "normal \<Plug>BenVimrcEscapeLatex"<CR>
+
+" Editing:
+" <leader>-in to increment a column of numbers
+"    e.g.   10         10
+"           10   -->   11
+"           10         12
+vmap <silent> <leader>in <Plug>VisualIncrement
 
 
 "  _  __          _     _           _ _
